@@ -1574,6 +1574,10 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
             if (!ok) {
                 return false;
             }
+            // The target and MTP schedulers may share physical compute buffers.
+            // llama_decode() is asynchronous, so finish the draft work before
+            // returning control to the target scheduler.
+            llama_synchronize(ctx_dft);
         }
 
         for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
